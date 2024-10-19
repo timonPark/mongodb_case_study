@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mongodb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mongodb-replica-set
+    volumes:
+      - ./config/mongod1.conf:/mongodb/config/mongod1.conf
+      - ./config/mongod2.conf:/mongodb/config/mongod2.conf
+      - ./config/mongod3.conf:/mongodb/config/mongod3.conf
+      - ./mongodb/data1:/mongodb/data1
+      - ./mongodb/data2:/mongodb/data2
+      - ./mongodb/data3:/mongodb/data3
+      - ./mongodb/logs:/mongodb/logs
+    command: >
+      /bin/bash -c "
+      /mongodb/bin/mongod -f /mongodb/config/mongod1.conf --fork &&
+      /mongodb/bin/mongod -f /mongodb/config/mongod2.conf --fork &&
+      /mongodb/bin/mongod -f /mongodb/config/mongod3.conf --fork &&
+      tail -f /dev/null"
+    networks:
+      - mongo-replica-set
+    ports:
+      - "27017:27017"
+      - "27018:27018"
+      - "27019:27019"
+
+networks:
+  mongo-replica-set:
+    driver: bridge
