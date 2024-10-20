@@ -1,30 +1,55 @@
 version: '3.8'
 
 services:
-  mongodb:
+  mongo1:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mongodb-replica-set
+    container_name: mongo1
     volumes:
       - ./config/mongod1.conf:/mongodb/config/mongod1.conf
-      - ./config/mongod2.conf:/mongodb/config/mongod2.conf
-      - ./config/mongod3.conf:/mongodb/config/mongod3.conf
-      - ./mongodb/data1:/mongodb/data1
-      - ./mongodb/data2:/mongodb/data2
-      - ./mongodb/data3:/mongodb/data3
+      - ./mongodb/data1:/mongodb/data
       - ./mongodb/logs:/mongodb/logs
     command: >
       /bin/bash -c "
-      /mongodb/bin/mongod -f /mongodb/config/mongod1.conf --fork &&
-      /mongodb/bin/mongod -f /mongodb/config/mongod2.conf --fork &&
-      /mongodb/bin/mongod -f /mongodb/config/mongod3.conf --fork &&
-      tail -f /dev/null"
+      /mongodb/bin/mongod -f /mongodb/config/mongod1.conf"
     networks:
       - mongo-replica-set
     ports:
       - "27017:27017"
+
+  mongo2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mongo2
+    volumes:
+      - ./config/mongod2.conf:/mongodb/config/mongod2.conf
+      - ./mongodb/data2:/mongodb/data
+      - ./mongodb/logs:/mongodb/logs
+    command: >
+      /bin/bash -c "
+      /mongodb/bin/mongod -f /mongodb/config/mongod2.conf"
+    networks:
+      - mongo-replica-set
+    ports:
       - "27018:27018"
+
+  mongo3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mongo3
+    volumes:
+      - ./config/mongod3.conf:/mongodb/config/mongod3.conf
+      - ./mongodb/data3:/mongodb/data
+      - ./mongodb/logs:/mongodb/logs
+    command: >
+      /bin/bash -c "
+      /mongodb/bin/mongod -f /mongodb/config/mongod3.conf"
+    networks:
+      - mongo-replica-set
+    ports:
       - "27019:27019"
 
 networks:
